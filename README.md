@@ -48,9 +48,8 @@ named `@articles` with all built articles returned by the
 
 ## An example
 
-Let's see a complete example using the default adapter.
-
-> The default adapter has Markdown and code highlighting support.
+Let's see a complete example using the default adapter, which has
+Markdown and code highlighting support.
 
 First add `nimble_publisher` and other required packages as dependencies:
 

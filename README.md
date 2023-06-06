@@ -5,6 +5,10 @@
 A minimal filesystem-based publishing engine that supports custom
 adapters.
 
+It aims to provide a more flexible mechanism for file parsing and transformation.
+
+> This is a fork of [NimblePublisher](https://github.com/dashbitco/nimble_publisher).
+
 ## Overview
 
 Suppose we have a batch of article files in following format:

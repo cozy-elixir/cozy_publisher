@@ -51,11 +51,11 @@ named `@articles` with all built articles returned by the
 Let's see a complete example using the default adapter, which has
 Markdown and code highlighting support.
 
-First add `nimble_publisher` and other required packages as dependencies:
+First add `cozy_publisher` and other required packages as dependencies:
 
     def deps do
       [
-        {:nimble_publisher, "~> 1.0"},
+        {:cozy_publisher, "~> 1.0"},
         {:makeup, "~> 1.0"},
         {:makeup_elixir, ">= 0.0.0"},
         {:makeup_erlang, ">= 0.0.0"}
@@ -176,7 +176,7 @@ live_reload: [
 ]
 ```
 
-## Use custom adapters
+## Custom adapters
 
 By using custom adapters, you can publish any kind of files, not limited to format required by the default adapter.
 

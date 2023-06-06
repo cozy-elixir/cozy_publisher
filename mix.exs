@@ -2,19 +2,23 @@ defmodule CozyPublisher.MixProject do
   use Mix.Project
 
   @version "1.0.0"
-  @url "https://github.com/dashbitco/nimble_publisher"
+  @name "CozyPublisher"
+  @description "A minimal filesystem-based publishing engine with Markdown support and code highlighting."
+  @source_url "https://github.com/cozy-elixir/cozy_publisher"
 
   def project do
     [
-      app: :nimble_publisher,
+      app: :cozy_publisher,
       version: @version,
       elixir: "~> 1.12",
-      name: "CozyPublisher",
-      description:
-        "A minimal filesystem-based publishing engine with Markdown support and code highlighting",
       deps: deps(),
+      name: @name,
+      description: @description,
+      source_url: @source_url,
+      homepage_url: @source_url,
       docs: docs(),
-      package: package()
+      package: package(),
+      aliases: aliases()
     ]
   end
 
@@ -28,16 +32,16 @@ defmodule CozyPublisher.MixProject do
     [
       {:earmark, "~> 1.4"},
       {:makeup, "~> 1.0"},
-      {:ex_doc, "~> 0.21", only: :docs},
-      {:makeup_elixir, ">= 0.0.0", only: [:test, :docs]}
+      {:ex_doc, "~> 0.21", only: [:dev]},
+      {:makeup_elixir, ">= 0.0.0", only: [:dev, :test]}
     ]
   end
 
   defp docs do
     [
       main: "CozyPublisher",
-      source_ref: "v#{@version}",
-      source_url: @url
+      source_url: @source_url,
+      source_ref: @version
     ]
   end
 
@@ -45,7 +49,17 @@ defmodule CozyPublisher.MixProject do
     %{
       licenses: ["Apache-2.0"],
       maintainers: ["Zeke Dou", "José Valim"],
-      links: %{"GitHub" => @url}
+      links: %{"GitHub" => @source_url}
     }
+  end
+
+  defp aliases do
+    [publish: ["hex.publish", "tag"], tag: &tag_release/1]
+  end
+
+  defp tag_release(_) do
+    Mix.shell().info("Tagging release as #{@version}")
+    System.cmd("git", ["tag", @version])
+    System.cmd("git", ["push", "--tags"])
   end
 end

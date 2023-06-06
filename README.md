@@ -181,7 +181,9 @@ live_reload: [
 
 ## Use custom adapters
 
-You may want to define a custom adapter.
+By using custom adapters, you can publish any kind of files, not limited to format required by the default adapter.
+
+You may want to define a custom adapter using JSON metadata header:
 
 ```elixir
 defmodule MyApp.Blog do
@@ -201,7 +203,7 @@ defmodule CustomAdapter do
 end
 ```
 
-Checkout `NimblePublisher.Adapter` for more details.
+You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `NimblePublisher.Adapter` for more details.
 
 ## Learn more
 

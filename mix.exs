@@ -8,7 +8,7 @@ defmodule CozyPublisher.MixProject do
     [
       app: :nimble_publisher,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       name: "CozyPublisher",
       description:
         "A minimal filesystem-based publishing engine with Markdown support and code highlighting",

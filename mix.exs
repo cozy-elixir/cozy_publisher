@@ -1,9 +1,9 @@
 defmodule CozyPublisher.MixProject do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "2.0.0"
   @name "CozyPublisher"
-  @description "A minimal filesystem-based publishing engine with Markdown support and code highlighting."
+  @description "A minimal filesystem-based publishing engine that supports custom adapters."
   @source_url "https://github.com/cozy-elixir/cozy_publisher"
 
   def project do

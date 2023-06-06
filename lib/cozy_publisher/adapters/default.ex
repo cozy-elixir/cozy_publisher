@@ -22,17 +22,50 @@ defmodule CozyPublisher.Adapters.Default do
 
   """
 
-  alias __MODULE__.Highlighter
+  require Logger
 
   @behaviour CozyPublisher.Adapter
 
   @impl true
   def init(opts) do
+    check_dep_earmark!()
+    check_dep_makeup!()
+
     for highlighter <- Keyword.get(opts, :highlighters, []) do
       Application.ensure_all_started(highlighter)
     end
 
     :ok
+  end
+
+  defp check_dep_earmark!() do
+    unless Code.ensure_loaded?(Earmark) do
+      Logger.error("""
+      Could not find required dependency.
+
+      Please add :earmark to your dependencies:
+
+          {:earmark, "~> 1.4"}
+
+      """)
+
+      raise "missing dependency - :earmark"
+    end
+  end
+
+  defp check_dep_makeup!() do
+    unless Code.ensure_loaded?(Makeup) do
+      Logger.error("""
+      Could not find required dependency.
+
+      Please add :makeup to your dependencies:
+
+          {:makeup, "~> 1.0"}
+
+      """)
+
+      raise "missing dependency - :makeup"
+    end
   end
 
   @impl true
@@ -82,21 +115,27 @@ defmodule CozyPublisher.Adapters.Default do
     |> as_html(body, opts)
   end
 
-  defp as_html(extname, body, opts) when extname in [".md", ".markdown"] do
-    earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
-    highlighters = Keyword.get(opts, :highlighters, [])
-    body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
-  end
+  if Code.ensure_loaded?(Earmark) do
+    defp as_html(extname, body, opts) when extname in [".md", ".markdown"] do
+      earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
+      highlighters = Keyword.get(opts, :highlighters, [])
+      body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
+    end
 
-  defp as_html(_extname, body, _opts) do
-    body
-  end
+    defp as_html(_extname, body, _opts) do
+      body
+    end
 
-  defp highlight(html, []) do
-    html
-  end
+    defp highlight(html, []) do
+      html
+    end
 
-  defp highlight(html, _) do
-    Highlighter.highlight(html)
+    defp highlight(html, _) do
+      __MODULE__.Highlighter.highlight(html)
+    end
+  else
+    defp as_html(_extname, body, _opts) do
+      body
+    end
   end
 end

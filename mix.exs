@@ -30,9 +30,9 @@ defmodule CozyPublisher.MixProject do
 
   defp deps do
     [
-      {:earmark, "~> 1.4"},
-      {:makeup, "~> 1.0"},
       {:ex_doc, "~> 0.21", only: [:dev]},
+      {:earmark, "~> 1.4", only: [:dev, :test]},
+      {:makeup, "~> 1.0", only: [:dev, :test]},
       {:makeup_elixir, ">= 0.0.0", only: [:dev, :test]}
     ]
   end

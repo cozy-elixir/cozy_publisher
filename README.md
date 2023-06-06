@@ -205,27 +205,12 @@ end
 
 You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `NimblePublisher.Adapter` for more details.
 
-## Learn more
-
-- [Dashbit's blog post which was the foundation for NimblePublisher](https://dashbit.co/blog/welcome-to-our-blog-how-it-was-made)
-- [Elixir School's lesson on using NimblePublisher, complete with Phoenix integration](https://elixirschool.com/en/lessons/libraries/nimble-publisher/)
-
 <!-- MDOC !-->
-
-## Nimble\*
-
-All nimble libraries by Dashbit:
-
-- [NimbleCSV](https://github.com/dashbitco/nimble_csv) - simple and fast CSV parsing
-- [NimbleOptions](https://github.com/dashbitco/nimble_options) - tiny library for validating and documenting high-level options
-- [NimbleParsec](https://github.com/dashbitco/nimble_parsec) - simple and fast parser combinators
-- [NimblePool](https://github.com/dashbitco/nimble_pool) - tiny resource-pool implementation
-- [NimblePublisher](https://github.com/dashbitco/nimble_publisher) - a minimal filesystem-based publishing engine with Markdown support and code highlighting
-- [NimbleTOTP](https://github.com/dashbitco/nimble_totp) - tiny library for generating time-based one time passwords (TOTP)
 
 ## License
 
 Copyright 2020 Dashbit
+Copyright 2023 Zeke Dou
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

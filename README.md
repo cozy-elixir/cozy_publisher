@@ -1,6 +1,6 @@
 # CozyPublisher
 
-<!-- MDOC !-->
+<!-- MDOC -->
 
 A minimal filesystem-based publishing engine that supports custom
 adapters.
@@ -202,7 +202,7 @@ end
 
 You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `CozyPublisher.Adapter` for more details.
 
-<!-- MDOC !-->
+<!-- MDOC -->
 
 ## License
 

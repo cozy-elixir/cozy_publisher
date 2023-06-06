@@ -1,4 +1,4 @@
-defmodule NimblePublisher.Adapter do
+defmodule CozyPublisher.Adapter do
   @moduledoc """
   The specification of adapters.
   """

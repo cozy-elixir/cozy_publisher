@@ -1,4 +1,4 @@
-defmodule NimblePublisher.Adapters.Default.Highlighter do
+defmodule CozyPublisher.Adapters.Default.Highlighter do
   @moduledoc false
 
   @doc """

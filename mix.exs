@@ -1,4 +1,4 @@
-defmodule NimblePublisher.MixProject do
+defmodule CozyPublisher.MixProject do
   use Mix.Project
 
   @version "1.0.0"
@@ -9,7 +9,7 @@ defmodule NimblePublisher.MixProject do
       app: :nimble_publisher,
       version: @version,
       elixir: "~> 1.7",
-      name: "NimblePublisher",
+      name: "CozyPublisher",
       description:
         "A minimal filesystem-based publishing engine with Markdown support and code highlighting",
       deps: deps(),
@@ -35,7 +35,7 @@ defmodule NimblePublisher.MixProject do
 
   defp docs do
     [
-      main: "NimblePublisher",
+      main: "CozyPublisher",
       source_ref: "v#{@version}",
       source_url: @url
     ]

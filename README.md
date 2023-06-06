@@ -1,6 +1,4 @@
-# NimblePublisher
-
-[Online Documentation](https://hexdocs.pm/nimble_publisher).
+# CozyPublisher
 
 <!-- MDOC !-->
 
@@ -23,10 +21,10 @@ Suppose we have a batch of article files in following format:
     IO.puts "hello world"
     ```
 
-And, we try to use `NimblePublisher` to publish them:
+And, we try to use `CozyPublisher` to publish them:
 
 ```elixir
-use NimblePublisher,
+use CozyPublisher,
   build: Article,
   from: Application.app_dir(:app_name, "priv/articles/**/*.md"),
   as: :articles
@@ -44,7 +42,7 @@ named `@articles` with all built articles returned by the
 - `:from` - a wildcard pattern where to find all entries.
 - `:as` - the name of the module attribute to store all built entries.
 - `:adapter` - the adapter and its options. It allows following formats:
-  - `nil` - (default) equals to `{NimblePublisher.Adapters.Default, []}`
+  - `nil` - (default) equals to `{CozyPublisher.Adapters.Default, []}`
   - `module()` - equals to `{module(), keyword()}`
   - `{module(), keyword()}`
 
@@ -100,20 +98,20 @@ defmodule MyApp.Blog.Post do
 end
 ```
 
-Now, we are ready to define our `MyApp.Blog` with `NimblePublisher`:
+Now, we are ready to define our `MyApp.Blog` with `CozyPublisher`:
 
 ```elixir
 defmodule MyApp.Blog do
-  alias NimblePublisher.Adapters.Default, as: DefaultAdapter
+  alias CozyPublisher.Adapters.Default, as: DefaultAdapter
   alias MyApp.Blog.Post
 
-  use NimblePublisher,
+  use CozyPublisher,
     build: Post,
     from: Application.app_dir(:my_app, "priv/posts/**/*.md"),
     as: :posts,
     adapter: {DefaultAdapter, highlighters: [:makeup_elixir, :makeup_erlang]}
 
-  # The @posts variable is first defined by NimblePublisher.
+  # The @posts variable is first defined by CozyPublisher.
   # Let's further modify it by sorting all posts by descending date.
   @posts Enum.sort_by(@posts, & &1.date, {:desc, Date})
 
@@ -187,13 +185,13 @@ You may want to define a custom adapter using JSON metadata header:
 
 ```elixir
 defmodule MyApp.Blog do
-  use NimblePublisher,
+  use CozyPublisher,
     # ...
     adapter: {CustomAdapter, []}
 end
 
 defmodule CustomAdapter do
-  use NimblePublisher.Adapter
+  use CozyPublisher.Adapter
 
   @impl true
   def parse(path, content, _opts) do
@@ -203,7 +201,7 @@ defmodule CustomAdapter do
 end
 ```
 
-You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `NimblePublisher.Adapter` for more details.
+You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `CozyPublisher.Adapter` for more details.
 
 <!-- MDOC !-->
 

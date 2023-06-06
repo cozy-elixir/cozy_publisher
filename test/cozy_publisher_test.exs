@@ -1,7 +1,7 @@
-defmodule NimblePublisherTest do
+defmodule CozyPublisherTest do
   use ExUnit.Case, async: true
 
-  doctest NimblePublisher
+  doctest CozyPublisher
 
   defmodule Builder do
     def build(filename, attrs, body) do
@@ -9,7 +9,7 @@ defmodule NimblePublisherTest do
     end
   end
 
-  alias NimblePublisherTest.Example
+  alias CozyPublisherTest.Example
 
   setup do
     File.rm_rf!("test/tmp")
@@ -20,7 +20,7 @@ defmodule NimblePublisherTest do
 
   test "builds all matching entries" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/**/*.md",
         as: :examples
@@ -39,7 +39,7 @@ defmodule NimblePublisherTest do
 
   test "converts to markdown" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/markdown.{md,markdown}",
         as: :examples
@@ -53,7 +53,7 @@ defmodule NimblePublisherTest do
 
   test "does not convert other extensions" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/text.txt",
         as: :examples
@@ -67,7 +67,7 @@ defmodule NimblePublisherTest do
 
   test "handles code blocks" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/nosyntax.md",
         as: :examples
@@ -79,11 +79,11 @@ defmodule NimblePublisherTest do
 
   test "handles highlight blocks" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/syntax.md",
         as: :highlights,
-        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
+        adapter: {CozyPublisher.Adapters.Default, highlighters: [:makeup_elixir]}
 
       assert hd(@highlights).attrs == %{syntax: "highlight"}
       assert hd(@highlights).body =~ "<pre><code class=\"makeup elixir\">"
@@ -92,11 +92,11 @@ defmodule NimblePublisherTest do
 
   test "does not require recompilation unless paths changed" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/syntax.md",
         as: :highlights,
-        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
+        adapter: {CozyPublisher.Adapters.Default, highlighters: [:makeup_elixir]}
     end
 
     refute Example.__mix_recompile__?()
@@ -104,11 +104,11 @@ defmodule NimblePublisherTest do
 
   test "requires recompilation if paths change" do
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/tmp/**/*.md",
         as: :highlights,
-        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
+        adapter: {CozyPublisher.Adapters.Default, highlighters: [:makeup_elixir]}
     end
 
     refute Example.__mix_recompile__?()
@@ -121,7 +121,7 @@ defmodule NimblePublisherTest do
 
   test "allows for custom adapter with parser returning {attrs, body}" do
     defmodule Adapter do
-      use NimblePublisher.Adapter
+      use CozyPublisher.Adapter
 
       @impl true
       def parse(path, content, _opts) do
@@ -138,7 +138,7 @@ defmodule NimblePublisherTest do
     end
 
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/custom.parser",
         as: :custom,
@@ -151,7 +151,7 @@ defmodule NimblePublisherTest do
 
   test "allows for custom adapter with parser returning a list of {attrs, body}" do
     defmodule MultiAdapter do
-      use NimblePublisher.Adapter
+      use CozyPublisher.Adapter
 
       @impl true
       def parse(path, content, _opts) do
@@ -172,7 +172,7 @@ defmodule NimblePublisherTest do
     end
 
     defmodule Example do
-      use NimblePublisher,
+      use CozyPublisher,
         build: Builder,
         from: "test/fixtures/custom.multi.parser",
         as: :custom,
@@ -189,7 +189,7 @@ defmodule NimblePublisherTest do
                  ~r/could not find separator --- in "test\/fixtures\/invalid.noseparator"/,
                  fn ->
                    defmodule Example do
-                     use NimblePublisher,
+                     use CozyPublisher,
                        build: Builder,
                        from: "test/fixtures/invalid.noseparator",
                        as: :example
@@ -202,7 +202,7 @@ defmodule NimblePublisherTest do
                  ~r/expected attributes for \"test\/fixtures\/invalid.nomap\" to return a map/,
                  fn ->
                    defmodule Example do
-                     use NimblePublisher,
+                     use CozyPublisher,
                        build: Builder,
                        from: "test/fixtures/invalid.nomap",
                        as: :example

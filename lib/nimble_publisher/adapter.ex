@@ -9,8 +9,8 @@ defmodule NimblePublisher.Adapter do
   @typedoc "The path of file."
   @type path() :: binary()
 
-  @typedoc "The contents of file."
-  @type contents() :: binary()
+  @typedoc "The content of file."
+  @type content() :: binary()
 
   @typedoc "The attributes parsed from file."
   @type attrs() :: map()
@@ -28,7 +28,7 @@ defmodule NimblePublisher.Adapter do
   @callback init(opts()) :: :ok
 
   @doc """
-  Parses the contents of files.
+  Parses the content of files.
 
   It must return:
 
@@ -36,7 +36,7 @@ defmodule NimblePublisher.Adapter do
     * a list of 2 element tuple with attributes and body - `[{attrs, body} | _]`
 
   """
-  @callback parse(path(), contents(), opts()) :: {attrs(), body()} | [{attrs(), body()}]
+  @callback parse(path(), content(), opts()) :: {attrs(), body()} | [{attrs(), body()}]
 
   @doc """
   Transforms the parsed body.

@@ -50,17 +50,17 @@ defmodule NimblePublisher do
 
     entries =
       Enum.flat_map(paths, fn path ->
-        contents = File.read!(path)
-        parsed_contents = adapter_module.parse(path, contents, adapter_opts)
-        build_entry(builder, path, parsed_contents, adapter_module, adapter_opts)
+        content = File.read!(path)
+        parsed_content = adapter_module.parse(path, content, adapter_opts)
+        build_entry(builder, path, parsed_content, adapter_module, adapter_opts)
       end)
 
     Module.put_attribute(module, as, entries)
     {from, paths}
   end
 
-  defp build_entry(builder, path, {_attr, _body} = parsed_contents, adapter_module, adapter_opts) do
-    build_entry(builder, path, [parsed_contents], adapter_module, adapter_opts)
+  defp build_entry(builder, path, {_attr, _body} = parsed_content, adapter_module, adapter_opts) do
+    build_entry(builder, path, [parsed_content], adapter_module, adapter_opts)
   end
 
   defp build_entry(builder, path, parsed_contents, adapter_module, adapter_opts)

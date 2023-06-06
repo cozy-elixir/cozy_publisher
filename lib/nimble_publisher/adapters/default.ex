@@ -36,8 +36,8 @@ defmodule NimblePublisher.Adapters.Default do
   end
 
   @impl true
-  def parse(path, contents, _opts) do
-    case parse_contents(path, contents) do
+  def parse(path, content, _opts) do
+    case parse_content(path, content) do
       {:ok, attrs, body} ->
         {attrs, body}
 
@@ -57,8 +57,8 @@ defmodule NimblePublisher.Adapters.Default do
     end
   end
 
-  defp parse_contents(path, contents) do
-    case :binary.split(contents, ["\n---\n", "\r\n---\r\n"]) do
+  defp parse_content(path, content) do
+    case :binary.split(content, ["\n---\n", "\r\n---\r\n"]) do
       [_] ->
         {:error, "could not find separator --- in #{inspect(path)}"}
 

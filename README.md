@@ -194,8 +194,8 @@ defmodule CustomAdapter do
   use NimblePublisher.Adapter
 
   @impl true
-  def parse(path, contents, _opts) do
-    [attrs, body] = :binary.split(contents, ["\n---\n"])
+  def parse(path, content, _opts) do
+    [attrs, body] = :binary.split(content, ["\n---\n"])
     {Jason.decode!(attrs), body}
   end
 end

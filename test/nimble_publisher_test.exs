@@ -154,8 +154,8 @@ defmodule NimblePublisherTest do
       use NimblePublisher.Adapter
 
       @impl true
-      def parse(path, contents, _opts) do
-        contents
+      def parse(path, content, _opts) do
+        content
         |> String.split("\n***\n")
         |> Enum.map(fn content ->
           body =

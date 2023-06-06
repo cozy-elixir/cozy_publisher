@@ -5,6 +5,8 @@ defmodule NimblePublisher do
              |> String.split("<!-- MDOC !-->")
              |> Enum.fetch!(1)
 
+  alias NimblePublisher.Adapters.Default, as: DefaultAdapter
+
   @doc false
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
@@ -29,97 +31,43 @@ defmodule NimblePublisher do
     builder = Keyword.fetch!(opts, :build)
     from = Keyword.fetch!(opts, :from)
     as = Keyword.fetch!(opts, :as)
-    parser_module = Keyword.get(opts, :parser)
 
-    for highlighter <- Keyword.get(opts, :highlighters, []) do
-      Application.ensure_all_started(highlighter)
-    end
+    {adapter_module, adapter_opts} =
+      case Keyword.get(opts, :adapter) do
+        nil ->
+          {DefaultAdapter, []}
+
+        {adapter_module, adapter_opts} ->
+          {adapter_module, adapter_opts}
+
+        adapter_module ->
+          {adapter_module, []}
+      end
+
+    :ok = adapter_module.init(adapter_opts)
 
     paths = from |> Path.wildcard() |> Enum.sort()
 
     entries =
       Enum.flat_map(paths, fn path ->
-        parsed_contents = parse_contents!(path, File.read!(path), parser_module)
-        build_entry(builder, path, parsed_contents, opts)
+        contents = File.read!(path)
+        parsed_contents = adapter_module.parse(path, contents, adapter_opts)
+        build_entry(builder, path, parsed_contents, adapter_module, adapter_opts)
       end)
 
     Module.put_attribute(module, as, entries)
     {from, paths}
   end
 
-  defp build_entry(builder, path, {_attr, _body} = parsed_contents, opts) do
-    build_entry(builder, path, [parsed_contents], opts)
+  defp build_entry(builder, path, {_attr, _body} = parsed_contents, adapter_module, adapter_opts) do
+    build_entry(builder, path, [parsed_contents], adapter_module, adapter_opts)
   end
 
-  defp build_entry(builder, path, parsed_contents, opts) when is_list(parsed_contents) do
+  defp build_entry(builder, path, parsed_contents, adapter_module, adapter_opts)
+       when is_list(parsed_contents) do
     Enum.map(parsed_contents, fn {attrs, body} ->
-      body =
-        path
-        |> Path.extname()
-        |> String.downcase()
-        |> convert_body(body, opts)
-
+      body = adapter_module.transform(path, body, adapter_opts)
       builder.build(path, attrs, body)
     end)
-  end
-
-  defp highlight(html, []) do
-    html
-  end
-
-  defp highlight(html, _) do
-    NimblePublisher.Highlighter.highlight(html)
-  end
-
-  defp parse_contents!(path, contents, nil) do
-    case parse_contents(path, contents) do
-      {:ok, attrs, body} ->
-        {attrs, body}
-
-      {:error, message} ->
-        raise """
-        #{message}
-
-        Each entry must have a map with attributes, followed by --- and a body. For example:
-
-            %{
-              title: "Hello World"
-            }
-            ---
-            Hello world!
-
-        """
-    end
-  end
-
-  defp parse_contents!(path, contents, parser_module) do
-    parser_module.parse(path, contents)
-  end
-
-  defp parse_contents(path, contents) do
-    case :binary.split(contents, ["\n---\n", "\r\n---\r\n"]) do
-      [_] ->
-        {:error, "could not find separator --- in #{inspect(path)}"}
-
-      [code, body] ->
-        case Code.eval_string(code, []) do
-          {%{} = attrs, _} ->
-            {:ok, attrs, body}
-
-          {other, _} ->
-            {:error,
-             "expected attributes for #{inspect(path)} to return a map, got: #{inspect(other)}"}
-        end
-    end
-  end
-
-  defp convert_body(extname, body, opts) when extname in [".md", ".markdown"] do
-    earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
-    highlighters = Keyword.get(opts, :highlighters, [])
-    body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
-  end
-
-  defp convert_body(_extname, body, _opts) do
-    body
   end
 end

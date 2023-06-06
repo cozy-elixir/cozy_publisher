@@ -83,7 +83,7 @@ defmodule NimblePublisherTest do
         build: Builder,
         from: "test/fixtures/syntax.md",
         as: :highlights,
-        highlighters: [:makeup_elixir]
+        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
 
       assert hd(@highlights).attrs == %{syntax: "highlight"}
       assert hd(@highlights).body =~ "<pre><code class=\"makeup elixir\">"
@@ -96,7 +96,7 @@ defmodule NimblePublisherTest do
         build: Builder,
         from: "test/fixtures/syntax.md",
         as: :highlights,
-        highlighters: [:makeup_elixir]
+        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
     end
 
     refute Example.__mix_recompile__?()
@@ -108,7 +108,7 @@ defmodule NimblePublisherTest do
         build: Builder,
         from: "test/tmp/**/*.md",
         as: :highlights,
-        highlighters: [:makeup_elixir]
+        adapter: {NimblePublisher.Adapters.Default, highlighters: [:makeup_elixir]}
     end
 
     refute Example.__mix_recompile__?()
@@ -119,9 +119,12 @@ defmodule NimblePublisherTest do
     assert Example.__mix_recompile__?()
   end
 
-  test "allows for custom page parsing function returning {attrs, body}" do
-    defmodule Parser do
-      def parse(path, content) do
+  test "allows for custom adapter with parser returning {attrs, body}" do
+    defmodule Adapter do
+      use NimblePublisher.Adapter
+
+      @impl true
+      def parse(path, content, _opts) do
         body =
           content
           |> :binary.split("\nxxx\n")
@@ -139,16 +142,19 @@ defmodule NimblePublisherTest do
         build: Builder,
         from: "test/fixtures/custom.parser",
         as: :custom,
-        parser: Parser
+        adapter: Adapter
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.parser", length: 5}
     end
   end
 
-  test "allows for custom page parsing function returning a list of {attrs, body}" do
-    defmodule MultiParser do
-      def parse(path, contents) do
+  test "allows for custom adapter with parser returning a list of {attrs, body}" do
+    defmodule MultiAdapter do
+      use NimblePublisher.Adapter
+
+      @impl true
+      def parse(path, contents, _opts) do
         contents
         |> String.split("\n***\n")
         |> Enum.map(fn content ->
@@ -170,7 +176,7 @@ defmodule NimblePublisherTest do
         build: Builder,
         from: "test/fixtures/custom.multi.parser",
         as: :custom,
-        parser: MultiParser
+        adapter: MultiAdapter
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.multi.parser", length: 5}

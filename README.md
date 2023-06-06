@@ -1,5 +1,8 @@
 # CozyPublisher
 
+[![CI](https://github.com/cozy-elixir/cozy_publisher/actions/workflows/ci.yml/badge.svg)](https://github.com/cozy-elixir/cozy_publisher/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/cozy_publisher.svg)](https://hex.pm/packages/cozy_publisher)
+
 <!-- MDOC -->
 
 A minimal filesystem-based publishing engine that supports custom

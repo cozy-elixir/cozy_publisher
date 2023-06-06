@@ -30,10 +30,14 @@ defmodule CozyPublisher.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.21", only: [:dev]},
       {:earmark, "~> 1.4", only: [:dev, :test]},
       {:makeup, "~> 1.0", only: [:dev, :test]},
-      {:makeup_elixir, ">= 0.0.0", only: [:dev, :test]}
+      {:makeup_elixir, ">= 0.0.0", only: [:dev, :test]},
+      {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: [:dev]},
+      {:credo, ">= 0.0.0", only: [:dev], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
+      {:mix_audit, ">= 0.0.0", only: [:dev], runtime: false}
     ]
   end
 

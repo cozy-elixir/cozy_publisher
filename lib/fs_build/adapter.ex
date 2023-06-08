@@ -1,4 +1,4 @@
-defmodule CozyPublisher.Adapter do
+defmodule FsBuild.Adapter do
   @moduledoc """
   The specification of adapters.
   """

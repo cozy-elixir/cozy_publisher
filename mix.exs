@@ -1,14 +1,14 @@
-defmodule CozyPublisher.MixProject do
+defmodule FsBuild.MixProject do
   use Mix.Project
 
   @version "2.0.0"
-  @name "CozyPublisher"
-  @description "A minimal filesystem-based publishing engine that supports custom adapters."
-  @source_url "https://github.com/cozy-elixir/cozy_publisher"
+  @name "FsBuild"
+  @description "A filesystem-based build engine."
+  @source_url "https://github.com/cozy-elixir/fs_build"
 
   def project do
     [
-      app: :cozy_publisher,
+      app: :fs_build,
       version: @version,
       elixir: "~> 1.12",
       deps: deps(),
@@ -43,7 +43,7 @@ defmodule CozyPublisher.MixProject do
 
   defp docs do
     [
-      main: "CozyPublisher",
+      main: "FsBuild",
       source_url: @source_url,
       source_ref: @version
     ]
@@ -52,7 +52,7 @@ defmodule CozyPublisher.MixProject do
   defp package do
     %{
       licenses: ["Apache-2.0"],
-      maintainers: ["Zeke Dou", "José Valim"],
+      maintainers: ["Zeke Dou", "Jos\351 Valim"],
       links: %{"GitHub" => @source_url}
     }
   end

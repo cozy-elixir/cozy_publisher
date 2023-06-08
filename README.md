@@ -1,7 +1,7 @@
-# CozyPublisher
+# FsBuild
 
-[![CI](https://github.com/cozy-elixir/cozy_publisher/actions/workflows/ci.yml/badge.svg)](https://github.com/cozy-elixir/cozy_publisher/actions/workflows/ci.yml)
-[![Hex.pm](https://img.shields.io/hexpm/v/cozy_publisher.svg)](https://hex.pm/packages/cozy_publisher)
+[![CI](https://github.com/cozy-elixir/fs_build/actions/workflows/ci.yml/badge.svg)](https://github.com/cozy-elixir/fs_build/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/fs_build.svg)](https://hex.pm/packages/fs_build)
 
 <!-- MDOC -->
 
@@ -28,10 +28,10 @@ Suppose we have a batch of article files in following format:
     IO.puts "hello world"
     ```
 
-And, we try to use `CozyPublisher` to publish them:
+And, we try to use `FsBuild` to publish them:
 
 ```elixir
-use CozyPublisher,
+use FsBuild,
   build: Article,
   from: Application.app_dir(:app_name, "priv/articles/**/*.md"),
   as: :articles
@@ -49,7 +49,7 @@ named `@articles` with all built articles returned by the
 - `:from` - a wildcard pattern where to find all entries.
 - `:as` - the name of the module attribute to store all built entries.
 - `:adapter` - the adapter and its options. It allows following formats:
-  - `nil` - (default) equals to `{CozyPublisher.Adapters.Default, []}`
+  - `nil` - (default) equals to `{FsBuild.Adapters.Default, []}`
   - `module()` - equals to `{module(), keyword()}`
   - `{module(), keyword()}`
 
@@ -58,11 +58,11 @@ named `@articles` with all built articles returned by the
 Let's see a complete example using the default adapter, which has
 Markdown and code highlighting support.
 
-First add `cozy_publisher` and other required packages as dependencies:
+First add `fs_build` and other required packages as dependencies:
 
     def deps do
       [
-        {:cozy_publisher, "~> 1.0"},
+        {:fs_build, "~> 1.0"},
         {:makeup, "~> 1.0"},
         {:makeup_elixir, ">= 0.0.0"},
         {:makeup_erlang, ">= 0.0.0"}
@@ -104,20 +104,20 @@ defmodule MyApp.Blog.Post do
 end
 ```
 
-Now, we are ready to define our `MyApp.Blog` with `CozyPublisher`:
+Now, we are ready to define our `MyApp.Blog` with `FsBuild`:
 
 ```elixir
 defmodule MyApp.Blog do
-  alias CozyPublisher.Adapters.Default, as: DefaultAdapter
+  alias FsBuild.Adapters.Default, as: DefaultAdapter
   alias MyApp.Blog.Post
 
-  use CozyPublisher,
+  use FsBuild,
     build: Post,
     from: Application.app_dir(:my_app, "priv/posts/**/*.md"),
     as: :posts,
     adapter: {DefaultAdapter, highlighters: [:makeup_elixir, :makeup_erlang]}
 
-  # The @posts variable is first defined by CozyPublisher.
+  # The @posts variable is first defined by FsBuild.
   # Let's further modify it by sorting all posts by descending date.
   @posts Enum.sort_by(@posts, & &1.date, {:desc, Date})
 
@@ -191,13 +191,13 @@ You may want to define a custom adapter using JSON metadata header:
 
 ```elixir
 defmodule MyApp.Blog do
-  use CozyPublisher,
+  use FsBuild,
     # ...
     adapter: {CustomAdapter, []}
 end
 
 defmodule CustomAdapter do
-  use CozyPublisher.Adapter
+  use FsBuild.Adapter
 
   @impl true
   def parse(path, content, _opts) do
@@ -207,7 +207,7 @@ defmodule CustomAdapter do
 end
 ```
 
-You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `CozyPublisher.Adapter` for more details.
+You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `FsBuild.Adapter` for more details.
 
 <!-- MDOC -->
 

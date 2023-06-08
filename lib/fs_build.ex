@@ -1,16 +1,16 @@
-defmodule CozyPublisher do
+defmodule FsBuild do
   @external_resource "README.md"
   @moduledoc "README.md"
              |> File.read!()
              |> String.split("<!-- MDOC -->")
              |> Enum.fetch!(1)
 
-  alias CozyPublisher.Adapters.Default, as: DefaultAdapter
+  alias FsBuild.Adapters.Default, as: DefaultAdapter
 
   @doc false
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
-      {from, paths} = CozyPublisher.__extract__(__MODULE__, opts)
+      {from, paths} = FsBuild.__extract__(__MODULE__, opts)
 
       for path <- paths do
         @external_resource Path.relative_to_cwd(path)

@@ -1,6 +1,6 @@
-defmodule CozyPublisher.Adapters.Default do
+defmodule FsBuild.Adapters.Default do
   @moduledoc """
-  The default adapter used by `CozyPublisher`.
+  The default adapter used by `FsBuild`.
 
   Files with the `.md` or `.markdown` extension will be converted to
   HTML with `Earmark`. Other files will be kept as is.
@@ -13,7 +13,7 @@ defmodule CozyPublisher.Adapters.Default do
   ## Options
 
     * `:earmark_options` - an `%Earmark.Options{}` struct
-    * `:highlighters` - which code highlighters to use. `CozyPublisher`
+    * `:highlighters` - which code highlighters to use. `FsBuild`
       uses `Makeup` for syntax highlighting and you will need to add its
       `.css` classes. You can generate the CSS classes by calling
       `Makeup.stylesheet(:vim_style, "makeup")` inside iex -S mix.
@@ -24,7 +24,7 @@ defmodule CozyPublisher.Adapters.Default do
 
   require Logger
 
-  @behaviour CozyPublisher.Adapter
+  @behaviour FsBuild.Adapter
 
   @impl true
   def init(opts) do

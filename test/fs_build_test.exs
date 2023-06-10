@@ -38,10 +38,10 @@ defmodule FsBuildTest do
   test "does not require recompilation unless paths changed" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/syntax.md",
-        as: :examples,
-        adapter: {DumbAdapter, []}
+        adapter: {DumbAdapter, []},
+        build: DumbBuilder,
+        as: :examples
     end
 
     refute Example.__mix_recompile__?()
@@ -50,10 +50,10 @@ defmodule FsBuildTest do
   test "requires recompilation if paths change" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/tmp/**/*.md",
-        as: :examples,
-        adapter: {DumbAdapter, []}
+        adapter: {DumbAdapter, []},
+        build: DumbBuilder,
+        as: :examples
     end
 
     refute Example.__mix_recompile__?()
@@ -84,10 +84,10 @@ defmodule FsBuildTest do
 
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/custom.parser",
-        as: :custom,
-        adapter: {CustomAdapter, []}
+        adapter: {CustomAdapter, []},
+        build: DumbBuilder,
+        as: :custom
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.parser", length: 5}
@@ -118,10 +118,10 @@ defmodule FsBuildTest do
 
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/custom.multi.parser",
-        as: :custom,
-        adapter: {CustomMultiAdapter, []}
+        adapter: {CustomMultiAdapter, []},
+        build: DumbBuilder,
+        as: :custom
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.multi.parser", length: 5}

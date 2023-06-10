@@ -21,10 +21,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
   test "builds all matching entries" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/**/*.md",
-        as: :examples,
-        adapter: {MarkdownPublisher, []}
+        adapter: {MarkdownPublisher, []},
+        build: DumbBuilder,
+        as: :examples
 
       assert [
                %{
@@ -50,10 +50,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
   test "converts to markdown" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/markdown.{md,markdown}",
-        as: :examples,
-        adapter: {MarkdownPublisher, []}
+        adapter: {MarkdownPublisher, []},
+        build: DumbBuilder,
+        as: :examples
 
       Enum.each(@examples, fn example ->
         assert example.attrs == %{hello: "world"}
@@ -65,10 +65,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
   test "handles code blocks" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/nosyntax.md",
-        as: :examples,
-        adapter: {MarkdownPublisher, []}
+        adapter: {MarkdownPublisher, []},
+        build: DumbBuilder,
+        as: :examples
 
       assert hd(@examples).attrs == %{syntax: "nohighlight"}
       assert hd(@examples).body =~ "<pre><code>IO.puts &quot;syntax&quot;</code></pre>"
@@ -78,10 +78,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
   test "handles highlight blocks" do
     defmodule Example do
       use FsBuild,
-        build: DumbBuilder,
         from: "test/fixtures/syntax.md",
-        as: :highlights,
-        adapter: {MarkdownPublisher, highlighters: [:makeup_elixir]}
+        adapter: {MarkdownPublisher, highlighters: [:makeup_elixir]},
+        build: DumbBuilder,
+        as: :highlights
 
       assert hd(@highlights).attrs == %{syntax: "highlight"}
       assert hd(@highlights).body =~ "<pre><code class=\"makeup elixir\">"
@@ -94,10 +94,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
                  fn ->
                    defmodule Example do
                      use FsBuild,
-                       build: DumbBuilder,
                        from: "test/fixtures/invalid.noseparator",
-                       as: :example,
-                       adapter: {MarkdownPublisher, []}
+                       adapter: {MarkdownPublisher, []},
+                       build: DumbBuilder,
+                       as: :example
                    end
                  end
   end
@@ -108,10 +108,10 @@ defmodule FsBuild.Adapters.MarkdownPublisherTest do
                  fn ->
                    defmodule Example do
                      use FsBuild,
-                       build: DumbBuilder,
                        from: "test/fixtures/invalid.nomap",
-                       as: :example,
-                       adapter: {MarkdownPublisher, []}
+                       adapter: {MarkdownPublisher, []},
+                       build: DumbBuilder,
+                       as: :example
                    end
                  end
   end

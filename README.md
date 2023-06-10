@@ -11,51 +11,33 @@ A filesystem-based build engine which provides a flexible mechanism for parsing 
 
 ## Overview
 
-Suppose we have a batch of article files in following format:
-
-    %{
-      title: "Hello world"
-    }
-    ---
-    Body of the "Hello world" article.
-
-    This is a *markdown* document with support for code highlighters:
-
-    ```elixir
-    IO.puts "hello world"
-    ```
-
-And, we try to use `FsBuild` to publish them:
-
 ```elixir
 use FsBuild,
-  build: Article,
   from: Application.app_dir(:app_name, "priv/articles/**/*.md"),
+  adapter: {FsBuild.Adapters.MarkdownPublisher, []},
+  build: Article,
   as: :articles
 ```
 
-The example above will get all matched files in the given directory,
-call `Article.build/3` for each file, passing the file path,
-the metadata, and the article body, and define a module attribute
-named `@articles` with all built articles returned by the
-`Article.build/3` function.
+The example above will:
+
+1. get all files whose path match the given pattern.
+2. extract `data` and `metadata` from files by using adapter `FsBuild.Adapters.MarkdownPublisher`.
+3. call `Article.build/3` for each file, passing the `data` and `metadata` arguments.
+4. define a module attribute named `@articles` with all built articles returned by `Articlre.build/3` function.
 
 ## Options
 
 - `:build` - the name of the module that will build each entry.
 - `:from` - a wildcard pattern where to find all entries.
 - `:as` - the name of the module attribute to store all built entries.
-- `:adapter` - the adapter and its options. It allows following formats:
-  - `nil` - (default) equals to `{FsBuild.Adapters.Default, []}`
-  - `module()` - equals to `{module(), keyword()}`
-  - `{module(), keyword()}`
+- `:adapter` - the adapter and its options. It allows following formats - `{module, opts}`.
 
 ## An example
 
-Let's see a complete example using the default adapter, which has
-Markdown and code highlighting support.
+Let's build a blog by using the built-in adapter - `FsBuild.Adapters.MarkdownPublisher`, which has Markdown and code highlighting support.
 
-First add `fs_build` and other required packages as dependencies:
+First, add `fs_build` and other required packages as dependencies:
 
     def deps do
       [
@@ -66,12 +48,11 @@ First add `fs_build` and other required packages as dependencies:
       ]
     end
 
-In this example, we are building a blog. Each post stays in the
-"posts" directory with the format:
+Each post stays in the "posts" directory with the format:
 
     /posts/YEAR/MONTH-DAY-ID.md
 
-A typical blog post will look like this:
+A typical post will look like this:
 
     # /posts/2020/04-17-hello-world.md
     %{
@@ -83,7 +64,7 @@ A typical blog post will look like this:
     ---
     This is the post.
 
-Therefore, we will define a `Post` struct that expects all of the fields
+Then, we define a `Post` struct that expects all of the fields
 above. We will also have a `:date` field that we will build from the
 filename. Overall, it will look like this:
 
@@ -92,7 +73,7 @@ defmodule MyApp.Blog.Post do
   @enforce_keys [:id, :author, :title, :body, :description, :tags, :date]
   defstruct [:id, :author, :title, :body, :description, :tags, :date]
 
-  def build(path, attrs, body) do
+  def build(path, body, attrs) do
     [year, month_day_id] = path |> Path.rootname() |> Path.split() |> Enum.take(-2)
     [month, day, id] = String.split(month_day_id, "-", parts: 3)
     date = Date.from_iso8601!("#{year}-#{month}-#{day}")
@@ -105,14 +86,14 @@ Now, we are ready to define our `MyApp.Blog` with `FsBuild`:
 
 ```elixir
 defmodule MyApp.Blog do
-  alias FsBuild.Adapters.Default, as: DefaultAdapter
+  alias FsBuild.Adapters.MarkdownPublisher
   alias MyApp.Blog.Post
 
   use FsBuild,
-    build: Post,
     from: Application.app_dir(:my_app, "priv/posts/**/*.md"),
-    as: :posts,
-    adapter: {DefaultAdapter, highlighters: [:makeup_elixir, :makeup_erlang]}
+    adapter: {MarkdownPublisher, highlighters: [:makeup_elixir, :makeup_erlang]},
+    build: Post,
+    as: :posts
 
   # The @posts variable is first defined by FsBuild.
   # Let's further modify it by sorting all posts by descending date.
@@ -182,29 +163,9 @@ live_reload: [
 
 ## Custom adapters
 
-By using custom adapters, you can publish any kind of files, not limited to format required by the default adapter.
+By using custom adapters, you can process any kind of files. For example, [org](https://orgmode.org/) files, JSON files, etc.
 
-You may want to define a custom adapter using JSON metadata header:
-
-```elixir
-defmodule MyApp.Blog do
-  use FsBuild,
-    # ...
-    adapter: {CustomAdapter, []}
-end
-
-defmodule CustomAdapter do
-  use FsBuild.Adapter
-
-  @impl true
-  def parse(path, content, _opts) do
-    [attrs, body] = :binary.split(content, ["\n---\n"])
-    {Jason.decode!(attrs), body}
-  end
-end
-```
-
-You can also create adapters supporting [org](https://orgmode.org/) files, etc. Checkout `FsBuild.Adapter` for more details.
+Checkout `FsBuild.Adapter` for more details.
 
 <!-- MDOC -->
 

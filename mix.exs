@@ -3,7 +3,7 @@ defmodule FsBuild.MixProject do
 
   @version "2.0.0"
   @name "FsBuild"
-  @description "A filesystem-based build engine."
+  @description "A filesystem-based build engine which provides a flexible mechanism for parsing and processing files."
   @source_url "https://github.com/cozy-elixir/fs_build"
 
   def project do

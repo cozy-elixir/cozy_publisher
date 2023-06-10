@@ -5,8 +5,6 @@ defmodule FsBuild do
              |> String.split("<!-- MDOC -->")
              |> Enum.fetch!(1)
 
-  alias FsBuild.Adapters.Default, as: DefaultAdapter
-
   @doc false
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
@@ -28,18 +26,7 @@ defmodule FsBuild do
     builder = Keyword.fetch!(opts, :build)
     from = Keyword.fetch!(opts, :from)
     as = Keyword.fetch!(opts, :as)
-
-    {adapter_module, adapter_opts} =
-      case Keyword.get(opts, :adapter) do
-        nil ->
-          {DefaultAdapter, []}
-
-        {adapter_module, adapter_opts} ->
-          {adapter_module, adapter_opts}
-
-        adapter_module ->
-          {adapter_module, []}
-      end
+    {adapter_module, adapter_opts} = Keyword.fetch!(opts, :adapter)
 
     :ok = adapter_module.init(adapter_opts)
 
@@ -48,23 +35,21 @@ defmodule FsBuild do
     entries =
       Enum.flat_map(paths, fn path ->
         content = File.read!(path)
-        parsed_content = adapter_module.parse(path, content, adapter_opts)
-        build_entry(builder, path, parsed_content, adapter_module, adapter_opts)
+        transformed_content = adapter_module.transform(path, content, adapter_opts)
+        build_entry(builder, path, transformed_content)
       end)
 
     Module.put_attribute(module, as, entries)
     {from, paths}
   end
 
-  defp build_entry(builder, path, {_attr, _body} = parsed_content, adapter_module, adapter_opts) do
-    build_entry(builder, path, [parsed_content], adapter_module, adapter_opts)
+  defp build_entry(builder, path, {_data, _metadata} = transformed_content) do
+    build_entry(builder, path, [transformed_content])
   end
 
-  defp build_entry(builder, path, parsed_contents, adapter_module, adapter_opts)
-       when is_list(parsed_contents) do
-    Enum.map(parsed_contents, fn {attrs, body} ->
-      body = adapter_module.transform(path, body, adapter_opts)
-      builder.build(path, attrs, body)
+  defp build_entry(builder, path, transformed_contents) when is_list(transformed_contents) do
+    Enum.map(transformed_contents, fn {data, metadata} ->
+      builder.build(path, data, metadata)
     end)
   end
 end

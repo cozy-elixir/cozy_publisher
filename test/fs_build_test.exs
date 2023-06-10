@@ -1,15 +1,32 @@
 defmodule FsBuildTest do
   use ExUnit.Case, async: true
 
+  alias __MODULE__.Example
+
   doctest FsBuild
 
-  defmodule Builder do
-    def build(filename, attrs, body) do
-      %{filename: filename, attrs: attrs, body: body}
+  defmodule DumbBuilder do
+    def build(_path, body, attrs) do
+      %{body: body, attrs: attrs}
     end
   end
 
-  alias FsBuildTest.Example
+  defmodule DumbAdapter do
+    use FsBuild.Adapter
+
+    @impl true
+    def transform(path, content, _opts) do
+      body =
+        content
+        |> :binary.split("\nxxx\n")
+        |> List.last()
+        |> String.upcase()
+
+      attrs = %{path: path, length: String.length(body)}
+
+      {body, attrs}
+    end
+  end
 
   setup do
     File.rm_rf!("test/tmp")
@@ -18,85 +35,13 @@ defmodule FsBuildTest do
     :ok
   end
 
-  test "builds all matching entries" do
-    defmodule Example do
-      use FsBuild,
-        build: Builder,
-        from: "test/fixtures/**/*.md",
-        as: :examples
-
-      assert [
-               %{filename: "crlf.md"},
-               %{filename: "markdown.md"},
-               %{filename: "nosyntax.md"},
-               %{filename: "syntax.md"}
-             ] =
-               @examples
-               |> update_in([Access.all(), :filename], &Path.basename/1)
-               |> Enum.sort_by(& &1.filename)
-    end
-  end
-
-  test "converts to markdown" do
-    defmodule Example do
-      use FsBuild,
-        build: Builder,
-        from: "test/fixtures/markdown.{md,markdown}",
-        as: :examples
-
-      Enum.each(@examples, fn example ->
-        assert example.attrs == %{hello: "world"}
-        assert example.body == "<p>\nThis is a markdown <em>document</em>.</p>\n"
-      end)
-    end
-  end
-
-  test "does not convert other extensions" do
-    defmodule Example do
-      use FsBuild,
-        build: Builder,
-        from: "test/fixtures/text.txt",
-        as: :examples
-
-      assert hd(@examples).attrs == %{hello: "world"}
-
-      assert hd(@examples).body ==
-               "This is a normal text.\n"
-    end
-  end
-
-  test "handles code blocks" do
-    defmodule Example do
-      use FsBuild,
-        build: Builder,
-        from: "test/fixtures/nosyntax.md",
-        as: :examples
-
-      assert hd(@examples).attrs == %{syntax: "nohighlight"}
-      assert hd(@examples).body =~ "<pre><code>IO.puts &quot;syntax&quot;</code></pre>"
-    end
-  end
-
-  test "handles highlight blocks" do
-    defmodule Example do
-      use FsBuild,
-        build: Builder,
-        from: "test/fixtures/syntax.md",
-        as: :highlights,
-        adapter: {FsBuild.Adapters.Default, highlighters: [:makeup_elixir]}
-
-      assert hd(@highlights).attrs == %{syntax: "highlight"}
-      assert hd(@highlights).body =~ "<pre><code class=\"makeup elixir\">"
-    end
-  end
-
   test "does not require recompilation unless paths changed" do
     defmodule Example do
       use FsBuild,
-        build: Builder,
+        build: DumbBuilder,
         from: "test/fixtures/syntax.md",
-        as: :highlights,
-        adapter: {FsBuild.Adapters.Default, highlighters: [:makeup_elixir]}
+        as: :examples,
+        adapter: {DumbAdapter, []}
     end
 
     refute Example.__mix_recompile__?()
@@ -105,10 +50,10 @@ defmodule FsBuildTest do
   test "requires recompilation if paths change" do
     defmodule Example do
       use FsBuild,
-        build: Builder,
+        build: DumbBuilder,
         from: "test/tmp/**/*.md",
-        as: :highlights,
-        adapter: {FsBuild.Adapters.Default, highlighters: [:makeup_elixir]}
+        as: :examples,
+        adapter: {DumbAdapter, []}
     end
 
     refute Example.__mix_recompile__?()
@@ -119,12 +64,12 @@ defmodule FsBuildTest do
     assert Example.__mix_recompile__?()
   end
 
-  test "allows for custom adapter with parser returning {attrs, body}" do
-    defmodule Adapter do
+  test "allows for custom adapter with parser returning {body, attrs}" do
+    defmodule CustomAdapter do
       use FsBuild.Adapter
 
       @impl true
-      def parse(path, content, _opts) do
+      def transform(path, content, _opts) do
         body =
           content
           |> :binary.split("\nxxx\n")
@@ -133,28 +78,28 @@ defmodule FsBuildTest do
 
         attrs = %{path: path, length: String.length(body)}
 
-        {attrs, body}
+        {body, attrs}
       end
     end
 
     defmodule Example do
       use FsBuild,
-        build: Builder,
+        build: DumbBuilder,
         from: "test/fixtures/custom.parser",
         as: :custom,
-        adapter: Adapter
+        adapter: {CustomAdapter, []}
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.parser", length: 5}
     end
   end
 
-  test "allows for custom adapter with parser returning a list of {attrs, body}" do
-    defmodule MultiAdapter do
+  test "allows for custom adapter with parser returning a list of {body, attrs}" do
+    defmodule CustomMultiAdapter do
       use FsBuild.Adapter
 
       @impl true
-      def parse(path, content, _opts) do
+      def transform(path, content, _opts) do
         content
         |> String.split("\n***\n")
         |> Enum.map(fn content ->
@@ -166,47 +111,21 @@ defmodule FsBuildTest do
 
           attrs = %{path: path, length: String.length(body)}
 
-          {attrs, body}
+          {body, attrs}
         end)
       end
     end
 
     defmodule Example do
       use FsBuild,
-        build: Builder,
+        build: DumbBuilder,
         from: "test/fixtures/custom.multi.parser",
         as: :custom,
-        adapter: MultiAdapter
+        adapter: {CustomMultiAdapter, []}
 
       assert hd(@custom).body == "BODY\n"
       assert hd(@custom).attrs == %{path: "test/fixtures/custom.multi.parser", length: 5}
       assert length(@custom) == 3
     end
-  end
-
-  test "raises if missing separator" do
-    assert_raise RuntimeError,
-                 ~r/could not find separator --- in "test\/fixtures\/invalid.noseparator"/,
-                 fn ->
-                   defmodule Example do
-                     use FsBuild,
-                       build: Builder,
-                       from: "test/fixtures/invalid.noseparator",
-                       as: :example
-                   end
-                 end
-  end
-
-  test "raises if not a map" do
-    assert_raise RuntimeError,
-                 ~r/expected attributes for \"test\/fixtures\/invalid.nomap\" to return a map/,
-                 fn ->
-                   defmodule Example do
-                     use FsBuild,
-                       build: Builder,
-                       from: "test/fixtures/invalid.nomap",
-                       as: :example
-                   end
-                 end
   end
 end

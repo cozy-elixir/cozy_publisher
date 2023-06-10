@@ -1,9 +1,6 @@
-defmodule FsBuild.Adapters.Default do
+defmodule FsBuild.Adapters.MarkdownPublisher do
   @moduledoc """
-  The default adapter used by `FsBuild`.
-
-  Files with the `.md` or `.markdown` extension will be converted to
-  HTML with `Earmark`. Other files will be kept as is.
+  An adapter for building a Markdown publishing system.
 
   ## Required dependencies
 
@@ -69,10 +66,17 @@ defmodule FsBuild.Adapters.Default do
   end
 
   @impl true
-  def parse(path, content, _opts) do
+  def transform(path, content, opts) do
+    {body, attrs} = parse_content!(path, content)
+    html_body = as_html(body, opts)
+
+    {html_body, attrs}
+  end
+
+  defp parse_content!(path, content) do
     case parse_content(path, content) do
-      {:ok, attrs, body} ->
-        {attrs, body}
+      {:ok, body, attrs} ->
+        {body, attrs}
 
       {:error, message} ->
         raise """
@@ -98,7 +102,7 @@ defmodule FsBuild.Adapters.Default do
       [code, body] ->
         case Code.eval_string(code, []) do
           {%{} = attrs, _} ->
-            {:ok, attrs, body}
+            {:ok, body, attrs}
 
           {other, _} ->
             {:error,
@@ -107,23 +111,11 @@ defmodule FsBuild.Adapters.Default do
     end
   end
 
-  @impl true
-  def transform(path, body, opts) do
-    path
-    |> Path.extname()
-    |> String.downcase()
-    |> as_html(body, opts)
-  end
-
   if Code.ensure_loaded?(Earmark) do
-    defp as_html(extname, body, opts) when extname in [".md", ".markdown"] do
+    defp as_html(body, opts) do
       earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
       highlighters = Keyword.get(opts, :highlighters, [])
       body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
-    end
-
-    defp as_html(_extname, body, _opts) do
-      body
     end
 
     defp highlight(html, []) do
@@ -134,7 +126,7 @@ defmodule FsBuild.Adapters.Default do
       __MODULE__.Highlighter.highlight(html)
     end
   else
-    defp as_html(_extname, body, _opts) do
+    defp as_html(body, _opts) do
       body
     end
   end

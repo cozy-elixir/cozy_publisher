@@ -12,36 +12,33 @@ defmodule FsBuild.Adapter do
   @typedoc "The content of file."
   @type content() :: binary()
 
-  @typedoc "The attributes parsed from file."
-  @type attrs() :: map()
+  @typedoc "The main data transformed from file."
+  @type data() :: any()
 
-  @typedoc "The body parsed from file."
-  @type body() :: binary()
+  @typedoc "The metadata transformed from file."
+  @type metadata() :: map()
 
   @doc """
-  Prepares for future works, such as:
+  Prepares for following works, such as:
 
     * checking required dependencies
     * starting necessary applications
+    * ...
 
   """
   @callback init(opts()) :: :ok
 
   @doc """
-  Parses the content of files.
+  Transforms the content of files.
 
   It must return:
 
-    * a 2 element tuple with attributes and body - `{attrs, body}`
-    * a list of 2 element tuple with attributes and body - `[{attrs, body} | _]`
+    * a 2 element tuple with attributes and body - `{data, metadata}`
+    * a list of 2 element tuple with attributes and body - `[{data, metadata} | _]`
 
   """
-  @callback parse(path(), content(), opts()) :: {attrs(), body()} | [{attrs(), body()}]
-
-  @doc """
-  Transforms the parsed body.
-  """
-  @callback transform(path(), body(), opts()) :: any()
+  @callback transform(path(), content(), opts()) ::
+              {data(), metadata()} | [{data(), metadata()}]
 
   defmacro __using__(_opts) do
     quote do
@@ -50,10 +47,6 @@ defmodule FsBuild.Adapter do
       @impl true
       def init(_opts), do: :ok
       defoverridable init: 1
-
-      @impl true
-      def transform(_path, body, _opts), do: body
-      defoverridable transform: 3
     end
   end
 end

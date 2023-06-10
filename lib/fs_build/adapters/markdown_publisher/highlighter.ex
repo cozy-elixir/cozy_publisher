@@ -1,5 +1,5 @@
 if Code.ensure_loaded?(Makeup) do
-  defmodule FsBuild.Adapters.Default.Highlighter do
+  defmodule FsBuild.Adapters.MarkdownPublisher.Highlighter do
     @moduledoc false
 
     @doc """

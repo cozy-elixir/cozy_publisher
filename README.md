@@ -5,10 +5,7 @@
 
 <!-- MDOC -->
 
-A minimal filesystem-based publishing engine that supports custom
-adapters.
-
-It aims to provide a more flexible mechanism for file parsing and transformation.
+A filesystem-based build engine which provides a flexible mechanism for parsing and processing files.
 
 > This is a fork of [NimblePublisher](https://github.com/dashbitco/nimble_publisher).
 

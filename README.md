@@ -5,7 +5,8 @@
 
 <!-- MDOC -->
 
-A filesystem-based build engine which provides a flexible mechanism for parsing and processing files.
+A filesystem-based build engine which provides a flexible mechanism for
+parsing and processing files.
 
 > This is a fork of [NimblePublisher](https://github.com/dashbitco/nimble_publisher).
 
@@ -22,20 +23,25 @@ use FsBuild,
 The example above will:
 
 1. get all files whose path match the given pattern.
-2. extract `data` and `metadata` from files by using adapter `FsBuild.Adapters.MarkdownPublisher`.
-3. call `Article.build/3` for each file, passing the `data` and `metadata` arguments.
-4. define a module attribute named `@articles` with all built articles returned by `Articlre.build/3` function.
+2. extract `data` and `metadata` from files by using adapter
+   `FsBuild.Adapters.MarkdownPublisher`.
+3. call `Article.build/3` for each file, passing the `data` and
+   `metadata` arguments.
+4. define a module attribute named `@articles` with all built articles
+   returned by `Article.build/3` function.
 
 ## Options
 
-- `:build` - the name of the module that will build each entry.
-- `:from` - a wildcard pattern where to find all entries.
-- `:as` - the name of the module attribute to store all built entries.
-- `:adapter` - the adapter and its options. It allows following formats - `{module, opts}`.
+- `:from` - a wildcard pattern where to find all files.
+- `:adapter` - the adapter and its options - `{module(), any()}`.
+- `:build` - the name of the module that will build each file.
+- `:as` - the name of the module attribute to store all built files.
 
 ## An example
 
-Let's build a blog by using the built-in adapter - `FsBuild.Adapters.MarkdownPublisher`, which has Markdown and code highlighting support.
+Let's build a blog by using the built-in adapter -
+`FsBuild.Adapters.MarkdownPublisher`, which has Markdown and code
+highlighting support.
 
 First, add `fs_build` and other required packages as dependencies:
 
@@ -48,13 +54,13 @@ First, add `fs_build` and other required packages as dependencies:
       ]
     end
 
-Each post stays in the "posts" directory with the format:
+Each post stays in the `priv/posts/` directory with the format:
 
-    /posts/YEAR/MONTH-DAY-ID.md
+    priv/posts/YEAR/MONTH-DAY-ID.md
 
 A typical post will look like this:
 
-    # /posts/2020/04-17-hello-world.md
+    # priv/posts/2020/04-17-hello-world.md
     %{
       title: "Hello world!",
       author: "José Valim",
@@ -95,7 +101,7 @@ defmodule MyApp.Blog do
     build: Post,
     as: :posts
 
-  # The @posts variable is first defined by FsBuild.
+  # The @posts module attribute is first defined by FsBuild.
   # Let's further modify it by sorting all posts by descending date.
   @posts Enum.sort_by(@posts, & &1.date, {:desc, Date})
 
@@ -108,9 +114,10 @@ defmodule MyApp.Blog do
 end
 ```
 
-**Important**: Avoid injecting the `@posts` attribute into multiple functions,
-as each call will make a complete copy of all posts. For example, if you want
-to show define `recent_posts()` as well as `all_posts()`, DO NOT do this:
+**Important**: Avoid injecting the `@posts` module attribute into multiple
+functions, as each call will make a complete copy of all posts. For example,
+if you want to show define `recent_posts()` as well as `all_posts()`,
+**DO NOT** do this:
 
 ```elixir
 def all_posts, do: @posts
@@ -150,20 +157,23 @@ end
 
 ### Live reloading
 
-If you are using Phoenix, you can enable live reloading by simply telling Phoenix to watch the "posts" directory. Open up "config/dev.exs", search for `live_reload:` and add this to the list of patterns:
+If you are using Phoenix, you can enable live reloading by simply telling
+Phoenix to watch the `priv/posts/` directory. Open up `config/dev.exs`,
+search for `live_reload:` and add this to the list of patterns:
 
 ```elixir
 live_reload: [
   patterns: [
     ...,
-    ~r"posts/*/.*(md)$"
+    ~r"priv/posts/*/.*(md)$"
   ]
 ]
 ```
 
 ## Custom adapters
 
-By using custom adapters, you can process any kind of files. For example, [org](https://orgmode.org/) files, JSON files, etc.
+By using custom adapters, you can process any kind of files. For example,
+[org](https://orgmode.org/) files, JSON files, YAML files, etc.
 
 Checkout `FsBuild.Adapter` for more details.
 

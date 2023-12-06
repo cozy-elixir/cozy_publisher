@@ -111,23 +111,17 @@ defmodule FsBuild.Adapters.MarkdownPublisher do
     end
   end
 
-  if Code.ensure_loaded?(Earmark) do
-    defp as_html(body, opts) do
-      earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
-      highlighters = Keyword.get(opts, :highlighters, [])
-      body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
-    end
+  defp as_html(body, opts) do
+    earmark_opts = Keyword.get(opts, :earmark_options, %Earmark.Options{})
+    highlighters = Keyword.get(opts, :highlighters, [])
+    body |> Earmark.as_html!(earmark_opts) |> highlight(highlighters)
+  end
 
-    defp highlight(html, []) do
-      html
-    end
+  defp highlight(html, []) do
+    html
+  end
 
-    defp highlight(html, _) do
-      __MODULE__.Highlighter.highlight(html)
-    end
-  else
-    defp as_html(body, _opts) do
-      body
-    end
+  defp highlight(html, _) do
+    __MODULE__.Highlighter.highlight(html)
   end
 end

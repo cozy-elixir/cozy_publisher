@@ -48,6 +48,7 @@ First, add `fs_build` and other required packages as dependencies:
     def deps do
       [
         {:fs_build, "~> 1.0"},
+        {:earmark, "~> 1.4"},
         {:makeup, "~> 1.0"},
         {:makeup_elixir, ">= 0.0.0"},
         {:makeup_erlang, ">= 0.0.0"}

@@ -30,9 +30,9 @@ defmodule FsBuild.MixProject do
 
   defp deps do
     [
-      {:earmark, "~> 1.4", only: [:dev, :test]},
-      {:makeup, "~> 1.0", only: [:dev, :test]},
-      {:makeup_elixir, ">= 0.0.0", only: [:dev, :test]},
+      {:earmark, "~> 1.4", optional: true},
+      {:makeup, "~> 1.0", optional: true},
+      {:makeup_elixir, ">= 0.0.0", only: [:test]},
       {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.21", only: [:dev]},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},

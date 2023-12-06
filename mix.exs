@@ -1,7 +1,7 @@
 defmodule FsBuild.MixProject do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "1.0.1"
   @name "FsBuild"
   @description "A filesystem-based build engine which provides a flexible mechanism for parsing and processing files."
   @source_url "https://github.com/cozy-elixir/fs_build"
@@ -32,7 +32,7 @@ defmodule FsBuild.MixProject do
     [
       {:earmark, "~> 1.4", optional: true},
       {:makeup, "~> 1.0", optional: true},
-      {:makeup_elixir, ">= 0.0.0", only: [:test]},
+      {:makeup_elixir, ">= 0.0.0", optional: true},
       {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.21", only: [:dev]},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},

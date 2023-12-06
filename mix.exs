@@ -1,7 +1,7 @@
 defmodule FsBuild.MixProject do
   use Mix.Project
 
-  @version "1.0.1"
+  @version "1.0.2"
   @name "FsBuild"
   @description "A filesystem-based build engine which provides a flexible mechanism for parsing and processing files."
   @source_url "https://github.com/cozy-elixir/fs_build"

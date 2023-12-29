@@ -43,6 +43,7 @@ defmodule FsBuild.MixProject do
 
   defp docs do
     [
+      extras: ["CHANGELOG.md"],
       main: "FsBuild",
       source_url: @source_url,
       source_ref: @version

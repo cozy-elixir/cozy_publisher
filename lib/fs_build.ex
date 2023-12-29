@@ -49,7 +49,21 @@ defmodule FsBuild do
 
   defp build_entry(builder, path, transformed_contents) when is_list(transformed_contents) do
     Enum.map(transformed_contents, fn {data, metadata} ->
-      builder.build(path, data, metadata)
+      apply_builder(builder, [path, data, metadata])
     end)
+  end
+
+  defp apply_builder(builder, args) when is_atom(builder) do
+    apply(builder, :build, args)
+  end
+
+  defp apply_builder(builder, args) when is_function(builder, 3) do
+    apply(builder, args)
+  end
+
+  defp apply_builder(_builder, _args) do
+    raise RuntimeError,
+          ":build option should be a module which has build/3 function inside, " <>
+            "or a function whose arity number is 3"
   end
 end

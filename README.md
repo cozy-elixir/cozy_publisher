@@ -34,7 +34,9 @@ The example above will:
 
 - `:from` - a wildcard pattern where to find all files.
 - `:adapter` - the adapter and its options - `{module(), any()}`.
-- `:build` - the name of the module that will build each file.
+- `:build` - this option can be:
+  - the name of module which has `build/3` function inside.
+  - a function whose arity number is 3.
 - `:as` - the name of the module attribute to store all built files.
 
 ## An example

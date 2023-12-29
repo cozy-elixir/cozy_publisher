@@ -64,6 +64,19 @@ defmodule FsBuildTest do
     assert Example.__mix_recompile__?()
   end
 
+  test "allows for passing a function as :build option" do
+    defmodule Example do
+      use FsBuild,
+        from: "test/fixtures/custom.parser",
+        adapter: {DumbAdapter, []},
+        build: fn _path, body, attrs -> %{body: body, attrs: attrs} end,
+        as: :custom
+
+      assert hd(@custom).body == "BODY\n"
+      assert hd(@custom).attrs == %{path: "test/fixtures/custom.parser", length: 5}
+    end
+  end
+
   test "allows for custom adapter with parser returning {body, attrs}" do
     defmodule CustomAdapter do
       use FsBuild.Adapter

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1
+
+### Fixes
+
+- Fix compile error when Earmark is not installed
+
 ## v1.1.0
 
 ### Enhancements
